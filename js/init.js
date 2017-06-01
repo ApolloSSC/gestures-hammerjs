@@ -98,10 +98,8 @@ jQuery(document).ready(function($){
 		};
 		
 		function paginationPrevious(event) {
-			console.log("previous");
 		};
 		function paginationNext(event){
-			console.log("next");
 		}
 
 		function resetElement(event) {
