@@ -1,20 +1,16 @@
 		
 jQuery(document).ready(function($){
-	
 	var isTouch = ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
 	//Activation des fonctions gestures uniquement sur les devices mobiles
 	if(isTouch){
 		var container = $(gestures.container);
-		var html = document.getElementsByTagName('html')[0];
 		var prevLink;
 		var nextLink;
 		function hasPreviousLinkFn(){
-			prevLink = false;
-			var hasNav = false;
 			//Recherche d'un lien avec rel=prev
 			prevLink = jQuery('a[rel=prev]');
-			hasNav = prevLink && prevLink.length > 0 ? true : false;
-			if(!hasNav){
+            var hasNav = prevLink && prevLink.length > 0 ? true : false;
+			if(!hasNav && gestures.category_navigation){
 				//Si pas de lien trouvé, on regarde si le menu contient un lien actif
 				var $currentMenuLi = $(".current-menu-item");
 				if($currentMenuLi && $currentMenuLi.length > 0){
@@ -28,12 +24,10 @@ jQuery(document).ready(function($){
 			return hasNav;
 		}
 		function hasNextLinkFn(){
-			nextLink = false;
-			var hasNav = false;
 			//Recherche d'un lien avec rel=next
 			nextLink = jQuery('a[rel=next]');
-			hasNav = nextLink && nextLink.length > 0 ? true : false;
-			if(!hasNav){
+            var hasNav = nextLink && nextLink.length > 0 ? true : false;
+			if(!hasNav && gestures.category_navigation){
 				//Si pas de lien trouvé, on regarde si le menu contient un lien actif
 				var $currentMenuLi = $(".current-menu-item");
 				if($currentMenuLi && $currentMenuLi.length > 0){
@@ -52,17 +46,7 @@ jQuery(document).ready(function($){
 		
 		function moveAllPage(event){
 			//container translation
-				container.css("left", event.deltaX + 'px');
-				container.css("right", -event.deltaX + 'px');
-				container.css("position", 'absolute');
-				//position fixed translation
-				/*var fixedElements = $('*').filter(function () { 
-					return $(this).css('position') == 'fixed';
-				});
-				if(fixedElements && fixedElements.length > 0){
-					fixedElements.css("left", event.deltaX + 'px');
-					fixedElements.css("right", -event.deltaX + 'px');
-				}*/
+			container.css("transform","translate(" + event.deltaX + "px, 0px)");
 		}
 		
 		function dragRight(event) {
@@ -103,16 +87,7 @@ jQuery(document).ready(function($){
 		}
 
 		function resetElement(event) {
-			container.css("position", 'relative');
-			container.css("left", '0px');
-			container.css("right", '0px');
-			var fixedElements = $('*').filter(function () { 
-					return $(this).css('position') == 'fixed';
-				});
-				if(fixedElements && fixedElements.length > 0){
-					fixedElements.css("left", '0' + 'px');
-					fixedElements.css("right", '0' + 'px');
-				}
+            container.css("transform", "none");
 		};
 		var touchControl = new Hammer(container[0], { dragLockToAxis: true, dragBlockHorizontal: true });
 		touchControl.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });

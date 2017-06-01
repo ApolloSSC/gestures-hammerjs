@@ -1,8 +1,8 @@
 <?php
 /*
 Plugin Name: Gestures HammerJS
-Plugin URI: http://www.apollossc.com
-Description: Brings basic gestures to WordPress using hammerjs
+Plugin URI: https://github.com/ApolloSSC/gestures-hammerjs
+Description: Brings basic gestures to WordPress using HammerJS
 Author: Rémy Villain
 Version: 1.0
 Author URI: www.apollossc.com
@@ -73,17 +73,31 @@ function gestures_hammer_settings_init(  ) {
 		__( 'Content container identifier (eg #page)', 'gestures' ), 
 		'gestures_container_render', 
 		'gestures_hammer_settings', 
-		'gestures_hammer_settings_section' 
+		'gestures_hammer_settings_section'
 	);
+    add_settings_field(
+        'category_navigation',
+        __( 'Category navigation ? (swipe categories)', 'gestures' ),
+        'gestures_category_navigation_render',
+        'gestures_hammer_settings',
+        'gestures_hammer_settings_section'
+    );
 }
 
 
 function gestures_container_render(  ) { 
 
-	$options = get_option( 'gestures_hammer_settings' , array('container' => '#page', 'destination' => get_site_url() ));
+	$options = get_option( 'gestures_hammer_settings' , array('container' => '#page', 'category_navigation' => true ));
 	?>
 	<input type='text' name='gestures_hammer_settings[container]' value='<?php echo $options['container']; ?>'>
 	<?php
+
+}
+
+function gestures_category_navigation_render() {
+    $options = get_option( 'gestures_hammer_settings' , array('container' => '#page', 'category_navigation' => 1 ));
+    $html = '<input type="checkbox" id="category_navigation" name="gestures_hammer_settings[category_navigation]" value="1"' . checked( 1, $options['category_navigation'], false ) . '/>';
+    echo $html;
 
 }
 
