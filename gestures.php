@@ -21,16 +21,21 @@ function gesture_enqueue_scripts() {
 				
 		// Now we can localize the script with our data.
 		$gestures_array = get_option( 'gestures_hammer_settings' , array('container' => '#page') );
-		wp_localize_script( 'gestures_init', 'gestures', $gestures_array );
+        wp_localize_script( 'gestures_init', 'gestures', $gestures_array );
 
 		// Enqueue the scripts.
-		wp_enqueue_script( 'hammer', plugins_url( 'js/hammer.min.js', __FILE__ ), array('jquery'), null, true );
-		wp_enqueue_script( 'gestures_init' );		
+        wp_enqueue_script( 'touch-emulator', plugins_url( 'js/touch-emulator.js', __FILE__ ), array('jquery'), null, true );
+        wp_enqueue_script( 'hammer', plugins_url( 'js/hammer.min.js', __FILE__ ), array('jquery'), null, true );
+        wp_enqueue_script( 'gestures_init' );
+
+
+        wp_register_style( 'gestures_style', plugins_url('css/style.css', __FILE__ ));
+        wp_enqueue_style('gestures_style');
 
 	}
 	
 }
- 
+
 add_action( 'wp_enqueue_scripts' , 'gesture_enqueue_scripts' );
 
 /* options courtesy of WordPress Settings Generator (http://http://wpsettingsapi.jeroensormani.com/) */

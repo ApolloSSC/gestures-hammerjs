@@ -1,6 +1,9 @@
 		
 jQuery(document).ready(function($){
+	var loadingHtml = '<div class="loader"></div>'
+    //TouchEmulator();
 	var isTouch = ('ontouchstart' in window) || window.DocumentTouch && document instanceof DocumentTouch;
+	var isNavigating = false;
 	//Activation des fonctions gestures uniquement sur les devices mobiles
 	if(isTouch){
 		var container = $(gestures.container);
@@ -45,8 +48,17 @@ jQuery(document).ready(function($){
 		var hasNextLink = hasNextLinkFn();
 		
 		function moveAllPage(event){
-			//container translation
-			container.css("transform","translate(" + event.deltaX + "px, 0px)");
+			if(!isNavigating){
+				//Fix vertical pan
+				if(event.angle > -10 && event.angle < 10 || event.angle > 170 && event.angle < 190 ){
+					var delta = event.deltaX;
+					var deltaParallax = -delta*0.5;
+					//container translation
+					container.css("transform","translate(" + event.deltaX + "px, 0px)");
+					$(".swipe-loading").css("transform","translate(" + event.deltaX + "px, 0px)");
+					$(".swipe-loading span").css("transform", "translate("+deltaParallax+"px, 0px)");
+				}
+			}
 		}
 		
 		function dragRight(event) {
@@ -63,33 +75,69 @@ jQuery(document).ready(function($){
 		};
 
 		function navigatePrevious(event) {
-			if ( hasPreviousLink ) {
-				jQuery(location).attr('href', prevLink.attr('href'));
-				container.html("");
-			}
-			else{
-				resetElement(event);
+			if(!isNavigating){
+				isNavigating = true;
+				if ( hasPreviousLink ) {
+					container.html("");
+					jQuery(".sl-left").css("transition", "transform 0.1s");
+					jQuery(".sl-left span").css("transition", "transform 0.1s");
+					setTimeout(function(){
+						var width = jQuery(".sl-left").width();
+						var parallax = Math.floor(-width*0.5);
+						jQuery(".sl-left").css("transform", "translate(" + width + "px, 0)");
+						jQuery(".sl-left span").css("transform", "translate(" + parallax + "px, 0)");
+					},20);
+					jQuery(".sl-left span").html(loadingHtml);
+					setTimeout(function(){
+						jQuery(location).attr('href', prevLink.attr('href'));
+					},20);
+				}
+				else{
+					resetElement(event);
+				}
 			}
 		};
 		function navigateNext(event){
-			if ( hasNextLink ) {
-				jQuery(location).attr('href', nextLink.attr('href'));
-				container.html("");
+			if(!isNavigating){
+				if ( hasNextLink ) {
+					container.html("");
+					jQuery(".sl-right").css("transition", "transform 0.1s");
+					jQuery(".sl-right span").css("transition", "transform 0.1s");
+					setTimeout(function(){
+						var width = jQuery(".sl-right").width();
+						var parallax = Math.floor(width*0.5);
+						jQuery(".sl-right").css("transform", "translate(-" + width + "px, 0)");
+						jQuery(".sl-right span").css("transform", "translate(" + parallax + "px, 0)");
+					},20);
+					jQuery(".sl-right span").html(loadingHtml);
+	
+					setTimeout(function(){
+						jQuery(location).attr('href', nextLink.attr('href'));
+					},20);
+	
+				}
+				else{
+					resetElement(event);
+				}
 			}
-			else{
-				resetElement(event);
-			}
+            isNavigating = true;
 		};
-		
-		function paginationPrevious(event) {
-		};
-		function paginationNext(event){
-		}
 
 		function resetElement(event) {
-            container.css("transform", "none");
+			if(!isNavigating){
+                container.css("transition", "transform 0.2s");
+                container.css("transform", "none");
+                $(".swipe-loading").css("transform", "none");
+                setTimeout(function(){
+                    container.css("transition", "");
+                }, 200);
+			}
 		};
-		var touchControl = new Hammer(container[0], { dragLockToAxis: true, dragBlockHorizontal: true });
+		var touchControl = new Hammer(container[0],
+			{
+				dragLockToAxis: true,
+				dragBlockHorizontal: true
+			});
 		touchControl.get('pan').set({ direction: Hammer.DIRECTION_HORIZONTAL });
 		touchControl.get('swipe').set({ direction: Hammer.DIRECTION_HORIZONTAL });
 		touchControl.on("panright", dragRight)
@@ -97,12 +145,9 @@ jQuery(document).ready(function($){
 				.on("swiperight", navigatePrevious)
 				.on("swipeleft", navigateNext)
 				.on("panend", resetElement);
-		
-		// var $pagination = $("nav[role=navigation]");
-		// if($pagination && $pagination.length > 0){
-			// touchControl.on("swipeup", paginationNext)
-				// .on("swipedown", paginationPrevious);
-		// }
+
+        jQuery("<div class='swipe-loading sl-left'><span></span></div>").insertBefore(container);
+        jQuery("<div class='swipe-loading sl-right'><span></span></div>").insertAfter(container);
 	}
 
 });
