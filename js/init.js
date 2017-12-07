@@ -76,9 +76,10 @@ jQuery(document).ready(function($){
 
 		function navigatePrevious(event) {
 			if(!isNavigating){
-				isNavigating = true;
 				if ( hasPreviousLink ) {
+					isNavigating = true;
 					container.html("");
+					disableHammer();
 					jQuery(".sl-left").css("transition", "transform 0.1s");
 					jQuery(".sl-left span").css("transition", "transform 0.1s");
 					setTimeout(function(){
@@ -86,11 +87,12 @@ jQuery(document).ready(function($){
 						var parallax = Math.floor(-width*0.5);
 						jQuery(".sl-left").css("transform", "translate(" + width + "px, 0)");
 						jQuery(".sl-left span").css("transform", "translate(" + parallax + "px, 0)");
+						setTimeout(function(){
+							window.location.href = prevLink.attr('href');
+							//jQuery(location).attr('href', prevLink.attr('href'));
+						},20);
 					},20);
 					jQuery(".sl-left span").html(loadingHtml);
-					setTimeout(function(){
-						jQuery(location).attr('href', prevLink.attr('href'));
-					},20);
 				}
 				else{
 					resetElement(event);
@@ -100,6 +102,8 @@ jQuery(document).ready(function($){
 		function navigateNext(event){
 			if(!isNavigating){
 				if ( hasNextLink ) {
+					isNavigating = true;
+					disableHammer();
 					container.html("");
 					jQuery(".sl-right").css("transition", "transform 0.1s");
 					jQuery(".sl-right span").css("transition", "transform 0.1s");
@@ -108,19 +112,18 @@ jQuery(document).ready(function($){
 						var parallax = Math.floor(width*0.5);
 						jQuery(".sl-right").css("transform", "translate(-" + width + "px, 0)");
 						jQuery(".sl-right span").css("transform", "translate(" + parallax + "px, 0)");
+
+						setTimeout(function(){
+							window.location.href = nextLink.attr('href');
+							//jQuery(location).attr('href', nextLink.attr('href'));
+						},20);
 					},20);
 					jQuery(".sl-right span").html(loadingHtml);
-	
-					setTimeout(function(){
-						jQuery(location).attr('href', nextLink.attr('href'));
-					},20);
-	
 				}
 				else{
 					resetElement(event);
 				}
 			}
-            isNavigating = true;
 		};
 
 		function resetElement(event) {
@@ -133,6 +136,14 @@ jQuery(document).ready(function($){
                 }, 200);
 			}
 		};
+
+		function disableHammer(){
+			touchControl.off("panright");
+			touchControl.off("panleft");
+			touchControl.off("swiperight");
+			touchControl.off("swipeleft");
+			touchControl.off("panend");
+		}
 		var touchControl = new Hammer(container[0],
 			{
 				dragLockToAxis: true,
